@@ -1,0 +1,5 @@
+#cluster	table	gene	chrom	txStart	txEnd	strand	hasExonConflicts	hasCdsConflicts	exonConflicts	cdsConflicts
+1	gene	g2	chr1	1000	2400	+	n	y		gene:g1,
+1	gene	g1	chr1	1000	2100	+	n	y		gene:g2,
+2	gene	gn2	chr1	1000	2400	-	n	y		gene:gn1,
+2	gene	gn1	chr1	1000	2100	-	n	y		gene:gn2,

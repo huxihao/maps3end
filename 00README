@@ -1,0 +1,15 @@
+maps3end
+
+This Python package provides some basic scripts to analyze data from MAPS, a method in the family of 3'-end RNA-seq developed in Fu Lab at UCSD.
+
+Quick start
+1. Install two dependent Python packages below (by pip, for example): 
+  pysam: https://code.google.com/p/pysam/
+  HTSeq: https://pypi.python.org/pypi/HTSeq
+2. Add path/to/maps3end to your PYTHONPATH
+3. Try scripts under maps3end/scripts/
+
+It has been run on Python 2.6.5 and 2.7.2.
+
+Please send an email to Yu Zhou (y6zhou@ucsd.edu) if you find any problem or have any suggestion. 
+
