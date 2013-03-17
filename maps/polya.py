@@ -71,26 +71,16 @@ class ElemScan(object):
                 
     def scan_elem(self, fin):
         """Scan the first Fasta record from given file handle"""
-        start = 0
-        curr_line = ''
-        curr_end = 0
+        dna = ''
         for line in fin:
             if line.startswith(">"): 
                 continue
-
-            curr_line = curr_line[curr_end:] + line.rstrip().upper()
-            for strand in ["+", "-"]:
-                for s, e in self.itermatch(curr_line, strand):
-                    yield (start+s, start+e, strand)    
-            
-            curr_end = max(0, len(curr_line) - self.ELEM_LENGTH + 1)
-            start += curr_end
+            dna += line.rstrip().upper()
         
-        curr_line = curr_line[curr_end:]
         for strand in ["+", "-"]:
-            for s, e in self.itermatch(curr_line, strand):
-                yield (start+s, start+e, strand) 
-
+            for s, e in self.itermatch(dna, strand):
+                yield (s, e, strand)    
+        
     def itermatch(self, dna, strand):
         """Abstract method to iterate match"""
         raise Exception("Abstract method, not to be called")
@@ -127,7 +117,7 @@ class PasScan(ElemScan):
                 sidx = m.start()
                 eidx = m.end()
         
-        if sidx:
+        if sidx is not None:
             yield (sidx, eidx)
             
 ############################################################################### 
@@ -141,31 +131,43 @@ class AstretchScan(ElemScan):
         """Generate matched (s, e) index on given sequence and strand"""
         sidx = None
         eidx = None
-        for j in xrange(len(dna) - AstretchScan.ASTRETCH_WINDOW):
+        j = 0
+        max_idx = len(dna) - AstretchScan.ASTRETCH_WINDOW + 1
+        while j < max_idx:
             win = dna[j:(j+AstretchScan.ASTRETCH_WINDOW)]
-            pos = None
+            cs = None
             if strand == '+':
                 if "AAAAAAAA" in win or win.count('A') >= 9:
-                    pos = j 
+                    cs = j
+                    ce = j + AstretchScan.ASTRETCH_WINDOW - 1
+                    while dna[cs] != 'A':
+                        cs += 1
+                    while dna[ce] != 'A':
+                        ce -= 1
             else:
                 if "TTTTTTTT" in win or win.count('T') >= 9:
-                    pos = j
+                    cs = j
+                    ce = j + AstretchScan.ASTRETCH_WINDOW - 1
+                    while dna[cs] != 'T':
+                        cs += 1
+                    while dna[ce] != 'T':
+                        ce -= 1
             
-            if pos is None:
-                continue
-
-            if sidx is None:
-                sidx = pos
-                eidx = pos + AstretchScan.ASTRETCH_WINDOW
-            elif eidx >= pos:
-                eidx = pos + AstretchScan.ASTRETCH_WINDOW
-            else:
-                yield (sidx, eidx)
-                sidx = pos
-                eidx = None
-        
-        if eidx is not None:
-            yield (sidx, eidx)
+            if cs is not None:
+                if sidx is None:
+                    sidx = cs
+                    eidx = ce
+                elif eidx >= cs or eidx >= j-1:
+                    eidx = ce
+                elif j > eidx + 1:
+                    yield (sidx, eidx+1)
+                    sidx = cs
+                    eidx = ce
+            
+            j += 1        
+            
+        if sidx is not None:
+            yield (sidx, eidx+1)
 
 ###############################################################################
     

@@ -1,0 +1,8 @@
+# use glob syntax.
+syntax: glob
+*.pyc
+*.pyo
+
+# switch to regexp syntax.
+syntax: regexp
+
