@@ -57,9 +57,9 @@ def process_command_line(argv):
 if __name__ == '__main__':
     options, args = process_command_line(sys.argv)
 
-    infile = sys.argv[1]
+    infile = args[1]
     assert os.path.exists(infile)
-    file_barcode = sys.argv[2]
+    file_barcode = args[2]
     assert os.path.exists(file_barcode)
     allowed_mismatch = options.mismatch
     

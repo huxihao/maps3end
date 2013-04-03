@@ -44,6 +44,7 @@ def decode_fastq(infile, barcode2name, mismatch=0, startpos=37, outprefix=None):
 
     for record in reader_fastq(infile):
         try:
+            print record[1]
             currseq = record[1][startpos-1:startpos+len(bc)-1]
         except:
             continue
@@ -113,16 +114,14 @@ class Decoder(object):
     def decode(self):
         """decode and write results"""
         for record in reader_fastq(self.infile):
-            try:
-                currseq = record[1][self.startpos:(self.startpos+self.lenbc)]
-                if len(currseq) < self.lenbc:
-                    sys.stderr.write("%s not have enough length" % currseq)
-            except:
-                continue
+            fqseq = record.get_seq() 
+            currseq = fqseq[self.startpos:(self.startpos+self.lenbc)]
+            if len(currseq) < self.lenbc:
+                sys.stderr.write("%s not have enough length" % currseq)
             
             bc = self.decode_one(currseq)
-            self.barcode2outhandle[bc].write('\n'.join(record)+'\n')
-        
+            self.barcode2outhandle[bc].write("%s\n" % str(record))
+
         for oh in self.barcode2outhandle.values():
             oh.close()
     
