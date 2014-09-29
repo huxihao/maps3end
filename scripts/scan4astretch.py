@@ -28,7 +28,7 @@ def process_command_line(argv):
 
     (options, args) = parser.parse_args(argv)
     if len(args) < 2:
-        parser.error("genome_dir equired")
+        parser.error("genome_dir is required")
         
     return options, args
 
